@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduLingo – English Learning Platform</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
+  <meta name="description" content="Learn English with EduLingo – a modern LMS platform for students and teachers." />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#111827" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then(reg => console.log('SW registered!', reg))
+          .catch(err => console.log('SW registration failed: ', err));
+      });
+    }
+  </script>
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      background: var(--bg-primary);
+    }
+    .auth-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+    }
+    .auth-left::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 50%, rgba(99,102,241,0.18) 0%, transparent 65%);
+    }
+    .auth-left-content { position: relative; max-width: 420px; text-align: center; }
+    .auth-logo {
+      display: flex; align-items: center; gap: 12px;
+      justify-content: center; margin-bottom: 40px;
+    }
+    .auth-logo-icon {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: var(--shadow-accent);
+    }
+    .auth-logo-text { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.03em; }
+    .auth-logo-text span { color: var(--accent-light); }
+    .auth-tagline {
+      font-size: 2.2rem; font-weight: 800;
+      line-height: 1.25; margin-bottom: 16px;
+      background: linear-gradient(135deg, #fff 40%, var(--accent-light));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .auth-sub { font-size: 1rem; color: var(--text-secondary); line-height: 1.7; }
+    .auth-features { margin-top: 36px; display: flex; flex-direction: column; gap: 14px; text-align: left; }
+    .auth-feature {
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+    }
+    .auth-feature-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .auth-feature-text { font-size: 0.88rem; color: var(--text-secondary); }
+    .auth-feature-text strong { color: var(--text-primary); display: block; font-size: 0.92rem; margin-bottom: 2px; }
+
+    .auth-right {
+      width: 480px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 40px;
+      background: var(--bg-secondary);
+      border-left: 1px solid var(--border-subtle);
+    }
+    .auth-form-box { width: 100%; max-width: 380px; }
+    .auth-form-title { font-size: 1.6rem; font-weight: 800; margin-bottom: 6px; }
+    .auth-form-sub { color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 28px; }
+    .auth-tabs {
+      display: flex; gap: 0;
+      background: var(--bg-primary);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+    .auth-tab {
+      flex: 1; text-align: center;
+      padding: 9px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all var(--transition);
+      border: none; background: none;
+    }
+    .auth-tab.active { background: var(--bg-card); color: var(--text-primary); }
+    .auth-form { display: flex; flex-direction: column; gap: 16px; }
+    .role-select-wrap { display: flex; gap: 10px; }
+    .role-btn {
+      flex: 1; padding: 11px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      background: transparent; color: var(--text-secondary);
+      font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; transition: all var(--transition);
+      text-align: center;
+    }
+    .role-btn.active { border-color: var(--accent); background: var(--accent-glow); color: var(--accent-light); }
+    .auth-divider { text-align: center; color: var(--text-muted); font-size: 0.82rem; position: relative; }
+    .auth-divider::before, .auth-divider::after {
+      content: ''; position: absolute; top: 50%;
+      width: 40%; height: 1px; background: var(--border-subtle);
+    }
+    .auth-divider::before { left: 0; }
+    .auth-divider::after { right: 0; }
+    .auth-submit { width: 100%; padding: 13px; font-size: 1rem; }
+    .auth-switch { text-align: center; color: var(--text-secondary); font-size: 0.85rem; margin-top: 18px; }
+    .auth-switch a { color: var(--accent-light); text-decoration: none; font-weight: 600; }
+    .auth-switch a:hover { text-decoration: underline; }
+    .input-error { border-color: var(--red) !important; }
+    .error-msg { color: var(--red); font-size: 0.78rem; display: none; }
+    @media (max-width: 900px) {
+      .auth-left { display: none; }
+      .auth-right { width: 100%; padding: 32px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="toast-container"></div>
+
+  <div class="auth-page">
+    <!-- Left branding panel -->
+    <div class="auth-left">
+      <div class="auth-left-content">
+        <div class="auth-logo">
+          <div class="auth-logo-icon">📚</div>
+          <div class="auth-logo-text">Edu<span>Lingo</span></div>
+        </div>
+        <h1 class="auth-tagline">Learn English the Smart Way</h1>
+        <p class="auth-sub">An all-in-one platform for teachers and students to create, take, and track English lessons.</p>
+        <div class="auth-features">
+          <div class="auth-feature">
+            <div class="auth-feature-icon">🎥</div>
+            <div class="auth-feature-text">
+              <strong>Video Lessons</strong>
+              Watch curated video lessons with embedded exercises.
+            </div>
+          </div>
+          <div class="auth-feature">
+            <div class="auth-feature-icon">📝</div>
+            <div class="auth-feature-text">
+              <strong>Tests & Homework</strong>
+              Auto-graded tests and teacher-reviewed homework.
+            </div>
+          </div>
+          <div class="auth-feature">
+            <div class="auth-feature-icon">📊</div>
+            <div class="auth-feature-text">
+              <strong>Progress Tracking</strong>
+              Real-time dashboards showing student progress.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right auth form -->
+    <div class="auth-right">
+      <div class="auth-form-box">
+        <div class="auth-logo" style="justify-content:flex-start;margin-bottom:24px;">
+          <div class="auth-logo-icon" style="width:38px;height:38px;font-size:1.1rem;">📚</div>
+          <div class="auth-logo-text" style="font-size:1.2rem;">Edu<span>Lingo</span></div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+          <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Sign Up</button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-form">
+          <h2 class="auth-form-title">Welcome back!</h2>
+          <p class="auth-form-sub">Sign in to access your dashboard.</p>
+          <form class="auth-form" id="loginFormEl" onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <label for="login-username">Username</label>
+              <input class="form-control" type="text" id="login-username" placeholder="Enter your username" required autocomplete="username" />
+            </div>
+            <div class="form-group">
+              <label for="login-password">Password</label>
+              <input class="form-control" type="password" id="login-password" placeholder="Enter your password" required autocomplete="current-password" />
+            </div>
+            <div id="login-error" class="error-msg"></div>
+            <button type="submit" class="btn btn-primary auth-submit" id="login-btn">Sign In</button>
+          </form>
+          <p class="auth-switch">Don't have an account? <a href="#" onclick="switchTab('register')">Sign up</a></p>
+        </div>
+
+        <!-- Register Form -->
+        <div id="register-form" class="hidden">
+          <h2 class="auth-form-title">Create account</h2>
+          <p class="auth-form-sub">Join EduLingo and start learning today.</p>
+          <form class="auth-form" id="registerFormEl" onsubmit="handleRegister(event)">
+            <div class="form-group">
+              <label>I am a:</label>
+              <div class="role-select-wrap">
+                <button type="button" class="role-btn active" id="role-student" onclick="selectRole('student')">🎓 Student</button>
+                <button type="button" class="role-btn" id="role-teacher" onclick="selectRole('teacher')">👨‍🏫 Teacher</button>
+              </div>
+              <input type="hidden" id="selected-role" value="student" />
+            </div>
+            <div class="form-group">
+              <label for="reg-username">Username</label>
+              <input class="form-control" type="text" id="reg-username" placeholder="Choose a username" required autocomplete="username" />
+            </div>
+            <div class="form-group">
+              <label for="reg-password">Password</label>
+              <input class="form-control" type="password" id="reg-password" placeholder="Create a strong password" required autocomplete="new-password" />
+            </div>
+            <div class="form-group">
+              <label for="reg-password2">Confirm Password</label>
+              <input class="form-control" type="password" id="reg-password2" placeholder="Repeat your password" required autocomplete="new-password" />
+            </div>
+            <div id="reg-error" class="error-msg"></div>
+            <button type="submit" class="btn btn-primary auth-submit" id="register-btn">Create Account</button>
+          </form>
+          <p class="auth-switch">Already have an account? <a href="#" onclick="switchTab('login')">Sign in</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

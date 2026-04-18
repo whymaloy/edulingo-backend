@@ -1,0 +1,22 @@
+{
+  "name": "EduLingo Mobile",
+  "short_name": "EduLingo",
+  "description": "Learn English with EduLingo - Modern LMS Platform",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0e1a",
+  "theme_color": "#111827",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3145/3145765.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3145/3145765.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

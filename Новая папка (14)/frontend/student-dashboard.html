@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Dashboard – EduLingo</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#111827" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then(reg => console.log('SW registered!', reg))
+          .catch(err => console.log('SW registration failed: ', err));
+      });
+    }
+  </script>
+</head>
+<body>
+<div id="toast-container"></div>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<div class="dashboard-layout">
+
+  <!-- ─── Sidebar ─── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <a href="#" class="logo-mark">
+        <div class="logo-icon">📚</div>
+        <div class="logo-text">Edu<span>Lingo</span></div>
+      </a>
+    </div>
+    <nav class="sidebar-nav">
+      <p class="nav-section-title">Overview</p>
+      <button class="nav-item active" onclick="showSection('dashboard')" id="nav-dashboard">
+        <span class="icon">🏠</span> Dashboard
+      </button>
+      <p class="nav-section-title">Learn</p>
+      <button class="nav-item" onclick="showSection('lessons')" id="nav-lessons">
+        <span class="icon">📖</span> Lessons
+      </button>
+      <button class="nav-item" onclick="showSection('tests')" id="nav-tests">
+        <span class="icon">📝</span> Tests
+      </button>
+      <button class="nav-item" onclick="showSection('homework')" id="nav-homework">
+        <span class="icon">📋</span> Homework
+      </button>
+      <p class="nav-section-title">My Progress</p>
+      <button class="nav-item" onclick="showSection('results')" id="nav-results">
+        <span class="icon">📊</span> My Results
+      </button>
+    </nav>
+    <div class="sidebar-user">
+      <div class="avatar" id="sb-avatar">S</div>
+      <div class="user-info">
+        <div class="user-name" id="sb-name">Student</div>
+        <div class="user-role">Student</div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Sign out">⏏️</button>
+    </div>
+  </aside>
+
+  <!-- ─── Main Content ─── -->
+  <div class="main-content">
+    <header class="topbar">
+      <div class="flex items-center gap-1">
+        <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
+        <h1 class="topbar-title" id="page-title">Dashboard</h1>
+      </div>
+      <div class="topbar-actions">
+        <span class="badge badge-green">Student</span>
+      </div>
+    </header>
+
+    <div class="page-body">
+
+      <!-- ── DASHBOARD ── -->
+      <section class="section active" id="section-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon purple">📖</div>
+            <div class="stat-value" id="stat-lessons">0</div>
+            <div class="stat-label">Lessons Available</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">✅</div>
+            <div class="stat-value" id="stat-tests-done">0</div>
+            <div class="stat-label">Tests Completed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon yellow">📋</div>
+            <div class="stat-value" id="stat-hw-done">0</div>
+            <div class="stat-label">Homework Submitted</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red">⭐</div>
+            <div class="stat-value" id="stat-avg-score">—</div>
+            <div class="stat-label">Avg. Test Score</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;" class="dashboard-widgets">
+          <div class="card">
+            <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px;">📖 Recent Lessons</h3>
+            <div id="widget-lessons"></div>
+          </div>
+          <div class="card">
+            <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px;">📊 My Test Scores</h3>
+            <div id="widget-scores"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── LESSONS ── -->
+      <section class="section" id="section-lessons">
+        <div class="section-header">
+          <h2 class="section-title">📖 All Lessons</h2>
+        </div>
+        <div class="lessons-grid" id="lessons-grid"></div>
+      </section>
+
+      <!-- ── TESTS ── -->
+      <section class="section" id="section-tests">
+        <div class="section-header">
+          <h2 class="section-title">📝 Tests</h2>
+        </div>
+        <div id="tests-list"></div>
+      </section>
+
+      <!-- ── HOMEWORK ── -->
+      <section class="section" id="section-homework">
+        <div class="section-header">
+          <h2 class="section-title">📋 Homework</h2>
+        </div>
+        <div id="homework-list"></div>
+      </section>
+
+      <!-- ── RESULTS ── -->
+      <section class="section" id="section-results">
+        <div class="section-header">
+          <h2 class="section-title">📊 My Results</h2>
+        </div>
+        <div class="card" style="margin-bottom:20px;">
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px;">Test Score History</h3>
+          <div id="results-list"></div>
+        </div>
+        <div class="card">
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px;">Homework Grades</h3>
+          <div id="hw-grades-list"></div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- ─── Modal: Lesson Detail ─── -->
+<div class="modal-overlay hidden" id="modal-lesson-view" onclick="handleModalClick(event,'modal-lesson-view')">
+  <div class="modal" style="max-width:740px;">
+    <div class="modal-header">
+      <h2 class="modal-title" id="lv-title">Lesson</h2>
+      <button class="modal-close" onclick="closeModal('modal-lesson-view')">✕</button>
+    </div>
+    <div id="lesson-view-body"></div>
+  </div>
+</div>
+
+<!-- ─── Modal: Take Test ─── -->
+<div class="modal-overlay hidden" id="modal-test-take" onclick="handleModalClick(event,'modal-test-take')">
+  <div class="modal" style="max-width:680px;">
+    <div class="modal-header">
+      <h2 class="modal-title" id="test-take-title">Test</h2>
+      <button class="modal-close" onclick="closeModal('modal-test-take')">✕</button>
+    </div>
+    <div id="test-take-body"></div>
+  </div>
+</div>
+
+<!-- ─── Modal: Submit Homework ─── -->
+<div class="modal-overlay hidden" id="modal-hw-submit" onclick="handleModalClick(event,'modal-hw-submit')">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="hw-submit-title">Submit Homework</h2>
+      <button class="modal-close" onclick="closeModal('modal-hw-submit')">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="card" style="padding:12px;cursor:default;" id="hw-submit-desc"></div>
+      <div class="form-group">
+        <label>Your Answer (text)</label>
+        <textarea class="form-control" id="hw-answer-text" rows="5" placeholder="Write your answer here..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Or upload a file</label>
+        <input class="form-control" type="file" id="hw-answer-file" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-hw-submit')">Cancel</button>
+        <button type="button" class="btn btn-primary" id="hw-submit-btn" onclick="submitHomeworkAnswer()">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Modal: Test Result ─── -->
+<div class="modal-overlay hidden" id="modal-test-result">
+  <div class="modal" style="max-width:480px;text-align:center;">
+    <div style="padding:20px 0;">
+      <div style="font-size:4rem;margin-bottom:12px;" id="result-emoji">🎉</div>
+      <h2 style="font-size:1.5rem;font-weight:800;margin-bottom:8px;" id="result-headline">Great job!</h2>
+      <p style="color:var(--text-secondary);margin-bottom:24px;" id="result-details">—</p>
+      <div class="progress-wrap" style="margin:0 auto 24px;max-width:280px;">
+        <div class="progress-bar" id="result-bar" style="width:0%"></div>
+      </div>
+      <div style="font-size:3rem;font-weight:800;color:var(--accent-light);" id="result-score">—</div>
+      <p style="color:var(--text-muted);font-size:0.85rem;margin-top:6px;">Score</p>
+      <button class="btn btn-primary" style="margin-top:24px;width:100%;" onclick="closeModal('modal-test-result');loadAll()">Done</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/student.js"></script>
+</body>
+</html>
